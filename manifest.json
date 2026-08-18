@@ -1,0 +1,9 @@
+{
+  "name": "Household Expense Tracker",
+  "short_name": "Expenses",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFBF0",
+  "theme_color": "#7EC4E8",
+  "icons": []
+}

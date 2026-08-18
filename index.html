@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Household Expenses</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#7EC4E8">
+<style>
+  :root {
+    --blue: #7EC4E8;
+    --blue-dark: #4FA3D1;
+    --blue-light: #E3F3FB;
+    --sand: #FFFBF0;
+    --sand-deep: #FFF3D6;
+    --yellow: #FFD873;
+    --yellow-light: #FFF3D0;
+    --coral: #FFB3A7;
+    --coral-light: #FFE4DE;
+    --green: #8FC98F;
+    --green-light: #E4F3E4;
+    --plum: #C9A4E0;
+    --plum-light: #F3E7FA;
+    --red: #E8756B;
+    --red-light: #FCE2DF;
+    --amber: #E8A93F;
+    --amber-light: #FBEBCF;
+    --ink: #4A4238;
+    --ink-soft: #928A78;
+    --paper: #FFFEFA;
+    --line: #F2E6C9;
+    --radius: 18px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--sand);
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 460px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: var(--sand);
+    padding-bottom: 40px;
+  }
+
+  header {
+    background: linear-gradient(160deg, var(--blue) 0%, var(--blue-dark) 100%);
+    padding: 20px 22px 24px;
+    border-radius: 0 0 28px 28px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    top: -40px; right: -50px;
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    background: rgba(255, 216, 115, 0.25);
+  }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; opacity: 0.85; position: relative; z-index: 1; }
+  .brand { font-size: 20px; font-weight: 800; margin-top: 2px; position: relative; z-index: 1; }
+
+  .month-switcher {
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255,255,255,0.16); border-radius: 14px;
+    padding: 6px 6px; margin-top: 14px; position: relative; z-index: 1;
+  }
+  .month-arrow {
+    background: none; border: none; color: white; width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; cursor: pointer; font-size: 18px; font-weight: 700;
+  }
+  .month-arrow:active { background: rgba(255,255,255,0.2); }
+  .month-label-btn {
+    background: none; border: none; color: white; font-size: 15px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+  }
+
+  .month-total-label { font-size: 12px; opacity: 0.85; margin-top: 16px; position: relative; z-index: 1; }
+  .month-total { font-size: 30px; font-weight: 800; margin-top: 2px; position: relative; z-index: 1; }
+  .this-month-btn {
+    display: inline-block; margin-top: 8px; background: rgba(255,255,255,0.18);
+    border: none; color: white; font-size: 11px; font-weight: 700;
+    padding: 5px 12px; border-radius: 20px; cursor: pointer; position: relative; z-index: 1;
+  }
+
+  .sync-badge {
+    position: absolute; top: 20px; right: 22px;
+    font-size: 11px; background: rgba(255,255,255,0.22);
+    padding: 5px 10px; border-radius: 20px; font-weight: 600;
+    display: flex; align-items: center; gap: 5px; z-index: 2;
+  }
+  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #C7E8A1; }
+
+  .add-btn {
+    margin: -18px 18px 0;
+    position: relative;
+    z-index: 3;
+    background: var(--paper);
+    border: none;
+    border-radius: 16px;
+    padding: 15px;
+    width: calc(100% - 36px);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--blue-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(74, 66, 56, 0.12);
+  }
+  .add-btn:active { transform: scale(0.98); }
+
+  .section-title {
+    font-size: 12px; font-weight: 700; color: var(--ink-soft);
+    letter-spacing: 1px; text-transform: uppercase;
+    margin: 24px 22px 10px;
+  }
+
+  .category-list {
+    margin: 0 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .cat-row {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 10px 14px;
+  }
+  .cat-row-top { display: flex; align-items: center; gap: 10px; }
+  .cat-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+  }
+  .cat-body { flex: 1; min-width: 0; }
+  .cat-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .cat-bar-track { background: var(--line); border-radius: 4px; height: 5px; margin-top: 6px; }
+  .cat-bar-fill { border-radius: 4px; height: 5px; }
+  .cat-amount { font-size: 14px; font-weight: 700; white-space: nowrap; color: var(--ink); }
+  .cat-budget-note { font-size: 11px; margin-top: 4px; font-weight: 600; }
+  .cat-budget-note.ok { color: var(--ink-soft); }
+  .cat-budget-note.warning { color: #B8791F; }
+  .cat-budget-note.over { color: #C0392B; }
+
+  .timeline {
+    margin: 0 18px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .tl-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; border-bottom: 1px solid var(--line);
+  }
+  .tl-row:last-child { border-bottom: none; }
+  .tl-icon { font-size: 17px; width: 22px; text-align: center; }
+  .tl-label { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .tl-meta { font-size: 12px; color: var(--ink-soft); margin-top: 1px; }
+  .tl-amount { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
+  .empty-state { padding: 26px 16px; text-align: center; color: var(--ink-soft); font-size: 13px; }
+
+  .panel {
+    margin: 0 18px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px;
+  }
+
+  .trend-chart {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 8px; height: 120px; margin-top: 6px;
+  }
+  .trend-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+  .trend-bar { width: 100%; max-width: 32px; border-radius: 6px 6px 3px 3px; background: var(--blue); min-height: 3px; }
+  .trend-bar.current { background: var(--blue-dark); }
+  .trend-label { font-size: 10px; color: var(--ink-soft); margin-top: 6px; font-weight: 600; }
+  .trend-amount { font-size: 9px; color: var(--ink-soft); margin-bottom: 3px; }
+
+  .history-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .history-field label {
+    font-size: 11px; font-weight: 700; color: var(--ink-soft);
+    text-transform: uppercase; letter-spacing: 0.4px;
+    display: block; margin-bottom: 5px;
+  }
+  .history-field input[type="date"], select.field-select {
+    width: 100%; border: 1.5px solid var(--line); border-radius: 10px;
+    padding: 9px 10px; font-size: 13px; font-family: inherit;
+    background: var(--sand); color: var(--ink);
+  }
+  .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .preset-pill {
+    border: 1.5px solid var(--line); background: var(--blue-light); color: var(--blue-dark);
+    padding: 7px 10px; border-radius: 20px; font-size: 12px; font-weight: 700;
+    cursor: pointer; font-family: inherit; text-align: center;
+  }
+  .preset-pill.selected { background: var(--blue-dark); color: white; border-color: var(--blue-dark); }
+
+  .result-total {
+    text-align: center; margin: 14px 0 0;
+    background: var(--sand); border-radius: 12px; padding: 12px;
+  }
+  .result-total .num { font-size: 22px; font-weight: 800; color: var(--blue-dark); }
+  .result-total .label { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+
+  footer { text-align: center; font-size: 11px; color: #C4BCA9; margin-top: 24px; }
+
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(58, 54, 48, 0.45);
+    display: none; align-items: flex-end; justify-content: center; z-index: 50;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--paper); width: 100%; max-width: 460px;
+    border-radius: 24px 24px 0 0; padding: 22px 22px 30px;
+    animation: slideUp 0.2s ease; max-height: 85vh; overflow-y: auto;
+  }
+  @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 16px; }
+  .field-label {
+    font-size: 12px; font-weight: 700; color: var(--ink-soft);
+    letter-spacing: 0.4px; text-transform: uppercase; margin: 14px 0 6px;
+  }
+  .pill-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill {
+    border: 1.5px solid var(--line); background: var(--sand);
+    padding: 9px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+    cursor: pointer; color: var(--ink);
+  }
+  .pill.selected { background: var(--blue-dark); border-color: var(--blue-dark); color: white; }
+  input[type="number"], input[type="text"], input[type="date"] {
+    width: 100%; border: 1.5px solid var(--line); border-radius: 12px;
+    padding: 12px 14px; font-size: 15px; font-family: inherit;
+    background: var(--sand); color: var(--ink);
+  }
+  .amount-input-wrap { position: relative; }
+  .amount-input-wrap .rp-prefix {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    font-size: 15px; color: var(--ink-soft); font-weight: 600; pointer-events: none;
+  }
+  .amount-input-wrap input { padding-left: 38px; }
+  input:focus, select:focus { outline: 2px solid var(--blue-dark); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 22px; }
+  .btn { flex: 1; padding: 14px; border-radius: 14px; border: none; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; }
+  .btn-cancel { background: var(--sand-deep); color: var(--ink-soft); }
+  .btn-save { background: var(--blue-dark); color: white; }
+  .btn-full { width: 100%; margin-top: 12px; }
+
+  select.field-select { appearance: none; -webkit-appearance: none; }
+
+  .budget-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .budget-row:last-child { border-bottom: none; }
+  .budget-row-name { flex: 1; font-size: 13px; font-weight: 600; }
+  .budget-row input { width: 110px; padding: 8px 10px; font-size: 13px; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: white; padding: 12px 20px; border-radius: 30px;
+    font-size: 13px; font-weight: 600; opacity: 0; transition: all 0.25s ease;
+    pointer-events: none; z-index: 100;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="sync-badge"><span class="sync-dot" id="syncDot"></span><span id="syncLabel">Syncing</span></div>
+    <div class="eyebrow">Household Budget</div>
+    <div class="brand">💰 Expense Tracker</div>
+
+    <div class="month-switcher">
+      <button class="month-arrow" onclick="shiftMonth(-1)" aria-label="Previous month">‹</button>
+      <button class="month-label-btn" id="monthLabelBtn" onclick="openModal('budgets')">August 2026 ⚙️</button>
+      <button class="month-arrow" onclick="shiftMonth(1)" aria-label="Next month">›</button>
+    </div>
+
+    <div class="month-total-label">Total spent</div>
+    <div class="month-total" id="monthTotal">Rp —</div>
+    <button class="this-month-btn" id="thisMonthBtn" onclick="goToCurrentMonth()" style="display:none;">Back to this month</button>
+  </header>
+
+  <button class="add-btn" onclick="openModal('expense')">
+    <span style="font-size:18px;">➕</span> Add Expense
+  </button>
+
+  <div class="section-title">By Category</div>
+  <div class="category-list" id="categoryList">
+    <div class="empty-state">No expenses logged this month yet.</div>
+  </div>
+
+  <div class="section-title">📈 6-Month Trend</div>
+  <div class="panel">
+    <div class="trend-chart" id="trendChart"></div>
+  </div>
+
+  <div class="section-title">📝 Recent</div>
+  <div class="timeline" id="timeline">
+    <div class="empty-state">Nothing logged yet — tap "Add Expense" above.</div>
+  </div>
+
+  <div class="section-title">🔍 Filter</div>
+  <div class="panel">
+    <div class="field-label" style="margin-top:0;">Category</div>
+    <select class="field-select" id="filterCategory">
+      <option value="All categories">All categories</option>
+      <option value="Utilities">Utilities</option>
+      <option value="Groceries">Groceries</option>
+      <option value="Dining Out">Dining Out</option>
+      <option value="Transportation">Transportation</option>
+      <option value="Baby & Childcare">Baby & Childcare</option>
+      <option value="Healthcare">Healthcare</option>
+      <option value="Household Supplies">Household Supplies</option>
+      <option value="Personal Care">Personal Care</option>
+      <option value="Entertainment & Subscriptions">Entertainment & Subscriptions</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <div class="field-label">Keyword (optional)</div>
+    <input type="text" id="filterKeyword" placeholder="e.g. coffee">
+
+    <div class="field-label">Date range</div>
+    <div class="preset-grid" id="filterPresets">
+      <button class="preset-pill" data-preset="today">Today</button>
+      <button class="preset-pill" data-preset="week">This week</button>
+      <button class="preset-pill" data-preset="month">This month</button>
+      <button class="preset-pill" data-preset="lastmonth">Last month</button>
+      <button class="preset-pill" data-preset="30">Last 30 days</button>
+      <button class="preset-pill" data-preset="90">Last 90 days</button>
+      <button class="preset-pill" data-preset="year">This year</button>
+      <button class="preset-pill" data-preset="all">All time</button>
+    </div>
+
+    <div class="field-label">Or pick custom dates</div>
+    <div class="history-controls">
+      <div class="history-field"><label for="filterStart">From</label><input type="date" id="filterStart"></div>
+      <div class="history-field"><label for="filterEnd">To</label><input type="date" id="filterEnd"></div>
+    </div>
+
+    <button class="btn btn-save btn-full" onclick="applyFilter()">Apply Filter</button>
+
+    <div id="filterResults" style="display:none;">
+      <div class="result-total">
+        <div class="num" id="filterTotal">Rp —</div>
+        <div class="label" id="filterCount">0 entries</div>
+      </div>
+      <div class="timeline" id="filterTimeline" style="margin-top:12px;"></div>
+    </div>
+  </div>
+
+  <footer>Synced to Google Sheets · v2</footer>
+</div>
+
+<!-- Expense Modal -->
+<div class="modal-backdrop" id="expenseModalBackdrop">
+  <div class="modal">
+    <div class="modal-title">💸 Add an Expense</div>
+
+    <div class="field-label" style="margin-top:0;">Amount (Rp)</div>
+    <div class="amount-input-wrap">
+      <span class="rp-prefix">Rp</span>
+      <input type="text" id="expAmount" placeholder="0" inputmode="numeric">
+    </div>
+
+    <div class="field-label">Category</div>
+    <div class="pill-row" id="expCategoryRow">
+      <div class="pill" data-val="Utilities">Utilities</div>
+      <div class="pill" data-val="Groceries">Groceries</div>
+      <div class="pill" data-val="Dining Out">Dining Out</div>
+      <div class="pill" data-val="Transportation">Transportation</div>
+      <div class="pill" data-val="Baby & Childcare">Baby & Childcare</div>
+      <div class="pill" data-val="Healthcare">Healthcare</div>
+      <div class="pill" data-val="Household Supplies">Household Supplies</div>
+      <div class="pill" data-val="Personal Care">Personal Care</div>
+      <div class="pill" data-val="Entertainment & Subscriptions">Entertainment</div>
+      <div class="pill" data-val="Other">Other</div>
+    </div>
+
+    <div class="field-label">Date</div>
+    <input type="date" id="expDate">
+
+    <div class="field-label">Notes</div>
+    <input type="text" id="expNotes" placeholder="e.g. Lunch at warung">
+
+    <div class="field-label">Logged by</div>
+    <div class="pill-row" id="expLoggedByRow">
+      <div class="pill" data-val="Me">Me</div>
+      <div class="pill" data-val="Partner">Partner</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeModal('expense')">Cancel</button>
+      <button class="btn btn-save" onclick="submitExpense()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Budgets Modal -->
+<div class="modal-backdrop" id="budgetsModalBackdrop">
+  <div class="modal">
+    <div class="modal-title">⚙️ Monthly Budget Limits</div>
+    <p style="font-size:13px; color:var(--ink-soft); margin:-8px 0 14px;">Leave blank for no limit on a category.</p>
+    <div id="budgetRows"></div>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeModal('budgets')">Cancel</button>
+      <button class="btn btn-save" onclick="saveBudgets()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
